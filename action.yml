@@ -5,9 +5,9 @@ branding:
   icon: package
   color: orange
 inputs:
-  token:
-    description: DigitalOcean API Token
-    required: true
+  # token:
+  #   description: DigitalOcean API Token
+  #   required: true
   project:
     description: Inside the Sandbox project name eg. vichacheewit, deadlinealwayseexist
     required: true
