@@ -1,0 +1,47 @@
+name: GitHub Action for Inside the Sandbox - DigitalOcean - Kubernetes
+description: auto deploy DigitalOcean k8s
+author: Krist Pornpairin
+branding:
+  icon: package
+  color: orange
+inputs:
+  token:
+    description: DigitalOcean API Token
+    required: true
+  project:
+    description: Inside the Sandbox project name eg. vichacheewit, deadlinealwayseexist
+    required: true
+  app:
+    description: Inside the Sandbox Project's App
+    required: true
+  path:
+    description: Relative Path to Docker file
+    required: true
+    default: .
+runs:
+  using: composite
+  steps: 
+    -
+      name: Doctl login
+      shell: bash
+      run: |
+        doctl registry login
+    - 
+      name: Doctl Config For Kubernetes
+      shell: bash
+      run: |
+        doctl kubernetes cluster kubeconfig save 49d2977a-5827-4036-9093-d26032fed169
+    - 
+      name: Docker Build image
+      shell: bash
+      run: docker build --tag registry.digitalocean.com/insidethesandbox/${{ inputs.project }}-${{ inputs.app }} ${{ inputs.path }}
+    -
+      name: Docker Push Image
+      shell: bash
+      run: |
+        docker push registry.digitalocean.com/insidethesandbox/${{ inputs.project }}-${{ inputs.app }}
+    - 
+      name: K8s Restart Deployment
+      shell: bash
+      run: |
+        kubectl rollout restart deployment/${{ inputs.app }} -n ${{ inputs.project }}
